@@ -34,7 +34,7 @@ class MailSpider(scrapy.Spider):
         for word in self.reject:
             if word in str(response.url):
                 return
-
+        print("Searching for emails...")
         html_text = str(response.text)
         rgx = r'[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+'
         mail_list = re.findall(rgx, html_text)
