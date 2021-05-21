@@ -1,3 +1,5 @@
+from concurrent.futures import ThreadPoolExecutor
+
 import googlesearch
 
 import logging
@@ -5,10 +7,15 @@ import os
 import pandas as pd
 import re
 import scrapy
+from PyQt5.QtCore import QThreadPool
 from scrapy.crawler import CrawlerProcess
 from scrapy.linkextractors.lxmlhtml import LxmlLinkExtractor
 
 #https://medium.com/@rodrigonader/web-scraping-to-extract-contact-information-part-1-mailing-lists-854e8a8844d2
+from thread_func import ThreadWorker
+from validate_emails import verify_results
+
+
 class MailSpider(scrapy.Spider):
     name = 'email'
 
@@ -39,9 +46,19 @@ class MailSpider(scrapy.Spider):
         rgx = r'[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+'
         mail_list = re.findall(rgx, html_text)
 
-        dic = {'email': mail_list, 'link': str(response.url)}
-        df = pd.DataFrame(dic)
-        print(df)
 
-        df.to_csv(self.path, mode='a', header=False)
+
+        dic = {'email': mail_list, 'link': str(response.url)}
+        # worker = ThreadWorker(verify_results, dic, self.path)
+        # with ThreadPoolExecutor(max_workers=5) as executor:
+        #     future = executor.submit(verify_results, dic,self.path)
+        #     print(future.result())
+        # th= ThreadPoolExecutor(5)
+        # worker = th.submit(verify_results, dic,self.path)
+        # self.threadpool.start(worker)
+        verify_results(dic, self.path)
+        # df = pd.DataFrame(dic)
+        # print(df)
+        #
+        # df.to_csv(self.path, mode='a', header=False)
         # df.to_csv(self.path, mode='a', header=False)
