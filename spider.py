@@ -35,6 +35,12 @@ class MailSpider(scrapy.Spider):
 
         for link in links:
             yield scrapy.Request(url=link, callback=self.parse_link)
+        print('Cleaning the save file...')
+        df = pd.read_csv(self.path, index_col=0)
+        df.columns = ['email', 'link']
+        df = df.drop_duplicates(subset='email')
+        df = df.reset_index(drop=True)
+        df.to_csv(self.path, mode='w', header=True)
 
     def parse_link(self, response):
 

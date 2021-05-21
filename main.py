@@ -48,12 +48,7 @@ class MainWindow(QWidget):
 
         self.threadpool.start(worker)
 
-        print('Cleaning the save file...')
-        df = pd.read_csv(path, index_col=0)
-        df.columns = ['email', 'link']
-        df = df.drop_duplicates(subset='email')
-        df = df.reset_index(drop=True)
-        df.to_csv(path, mode='w', header=True)
+
 
 def main():
     app = QApplication(sys.argv)
