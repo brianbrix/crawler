@@ -1,42 +1,35 @@
+import asyncio
 from datetime import datetime
 from functools import partial
 
 import pandas as pd
-from verify_email import verify_email
+from verify_email import verify_email, verify_email_async
 
 import multiprocessing
 
-
-def validate(emails, all_data={}, path=""):
-    print("verify now...")
-    count=1
-    for email in emails:
-        value = verify_email(email)
-        print(email, all_data, value)
-        if value:
-            if email in all_data["email"]:
-                dic = {'email': email, 'link': all_data["link"], }
-                df = pd.DataFrame(dic, index=[count])
-                print(df)
-                df.to_csv(path, mode='a', header=False)
-                count+=1
-
-    # print(ls)
+from codes import EmailToName
 
 
-def main(emails=["mokandubrian@gmail.com", "xyz231312dasdaf@gmail.com", "foo@bar.com", "ex@example.com"], all_data={},
-         path=''):
-    b = datetime.now()
-    # pool = multiprocessing.Pool()
-    # result = pool.map(partial(validate, all_data=all_data, path=path), emails)
-    validate(emails=emails, all_data=all_data, path=path)
-    delta = datetime.now() - b
+class EMailValidate:
+    """
+    @:param
+    """
 
-    print(delta.total_seconds())
+    def __init__(self, mails_list, path):
+        super(EMailValidate, self).__init__()
+        self.mails_list = mails_list
+        self.path2 = path
+        pool = multiprocessing.Pool()
+        result = pool.map(self.validate, [(k, v) for k, v in self.mails_list.items()])
 
-
-def verify_results(all_data, path):
-    main(emails=all_data["email"], all_data=all_data, path=path)
-
-
-
+    def validate(self, email):
+        print(email[0])
+        if len(email) == 2:
+            value = verify_email(str(email[0]))
+            if value:
+                names = EmailToName(email[0])
+                dic = {'email': email[0], "firstname": names["first_name"], "lastname": names["last_name"],
+                       "way": email[1]}
+                print(dic)
+                df = pd.DataFrame(dic, index=["Index"])
+                df.to_csv(self.path2, mode='a', header=False, index=True)

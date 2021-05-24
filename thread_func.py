@@ -60,3 +60,5 @@ class ThreadWorker(QRunnable):
         finally:
             self.signals.finished.emit()  # Done
 
+
+
